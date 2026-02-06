@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pengurusan Program Promosi PPD Tangkak</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+
+  <style>
+    :root{--royal-purple:#2e004f;--glow-purple:#8a2be2;--deep-purple:#1a0033}
+    *{box-sizing:border-box;font-family:'Poppins',sans-serif}
+    body{background:#fcfcfc;margin:0;color:#333}
+    header{
+      background:linear-gradient(135deg,var(--deep-purple),var(--royal-purple),var(--glow-purple));
+      padding:40px 20px;text-align:center;color:#fff;border-bottom:5px solid var(--glow-purple)
+    }
+    header img{max-width:140px;margin-bottom:15px;filter:drop-shadow(0 0 10px rgba(255,255,255,.4))}
+    header h1{margin:0;font-size:1.8rem;text-transform:uppercase;letter-spacing:1.5px}
+    .container{max-width:1100px;margin:30px auto;padding:0 20px}
+    .card{background:#fff;padding:30px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+    h2{color:var(--royal-purple);border-left:6px solid var(--glow-purple);padding-left:15px}
+    .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+    label{display:block;margin-bottom:8px;font-weight:600;font-size:.9rem}
+    input,select{width:100%;padding:12px;border:1.5px solid #e0e0e0;border-radius:10px}
+    .btn-main{
+      background:linear-gradient(to right,var(--royal-purple),var(--glow-purple));
+      color:#fff;padding:15px 40px;border:none;border-radius:50px;font-weight:600;cursor:pointer;width:100%;margin-top:20px
+    }
+    .table-container{margin-top:40px;overflow-x:auto;display:none}
+    table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden}
+    th{background:var(--royal-purple);color:#fff;padding:15px;text-align:left}
+    td{padding:12px 15px;border-bottom:1px solid #eee;font-size:.9rem}
+    footer{text-align:center;padding:40px;color:#777;font-size:.85rem}
+    .badge{padding:4px 10px;border-radius:20px;font-size:.8rem;font-weight:bold}
+    .bg-green{background:#e8f5e9;color:#2e7d32}
+    .bg-orange{background:#fff3e0;color:#ef6c00}
+    .custom-input{display:none;margin-top:10px}
+    .hint{font-size:.82rem;color:#666;margin-top:6px}
+    .action-btns{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;flex-wrap:wrap}
+    .btn-export{padding:10px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;color:#fff}
+    .btn-excel{background:#217346}.btn-pdf{background:#d32f2f}.btn-refresh{background:#444}
+    .statusbar{margin-top:12px;font-size:.85rem;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  </style>
+</head>
+
+<body>
+<header>
+  <img src="./assets/logo-kkm.png" alt="Logo KKM"
+    onerror="this.onerror=null; this.style.display='none'; document.getElementById('fallbackTitle').style.display='block';">
+  <div id="fallbackTitle" style="display:none;font-weight:600;margin-bottom:10px;">PPD TANGKAK</div>
+  <h1>Pengurusan Program Promosi<br>Pejabat Pergigian Daerah Tangkak</h1>
+</header>
+
+<div class="container">
+  <div class="card">
+    <h2>Langkah 1: Perancangan Program Promosi</h2>
+
+    <form onsubmit="return false;">
+      <div class="form-grid">
+        <div>
+          <label>Tarikh</label>
+          <input type="date" id="tarikh" required onchange="updateDay()">
+        </div>
+        <div>
+          <label>Hari</label>
+          <input type="text" id="hari" readonly placeholder="Automatik dari tarikh">
+        </div>
+
+        <div>
+          <label>Nama Penyelaras</label>
+          <select id="penyelaras" required>
+            <option value="">-- Pilih Penyelaras --</option>
+            <option>DR. NORFAIZA BINTI MOHD SABRI</option>
+            <option>DR. UMI BINTI AB JALIL</option>
+            <option>DR. SITI SARAH BINTI NOR RIZAN</option>
+            <option>DR. MOHD FAEZUDDEEN BIN MD. DOM</option>
+            <option>DR. NOOR FADZILAH BINTI AMIRUDIN</option>
+            <option>DR. NURFARIEZA JASMINE BINTI NAZRI</option>
+            <option>DR. SITI NABILA BINTI SAKRONI</option>
+            <option>DR. NOR AFEFAH BINTI MOHD KHALID</option>
+            <option>DR. NOR BASYIRAH BINTI BOHARI</option>
+            <option>DR. TUAN MUHAMMAD FAUZAN BIN TUAN IBRAHIM</option>
+            <option>DR. MUHAMAD IYAD BIN RAMZI</option>
+            <option>DR. KHOIRUN ANNISYAK BINTI SUBADI</option>
+            <option>... (boleh kekalkan list penuh awak) ...</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Tajuk Program</label>
+          <select id="tajuk" required onchange="toggleTajukLain()">
+            <option value="">-- Pilih Tajuk --</option>
+            <option>MINGGU PROMOSI KESIHATAN PERGIGIAN KEBANGSAAN</option>
+            <option>BENGKEL IGG</option>
+            <option>PROGRAM KOA</option>
+            <option>PROGRAM KAMPUNG ANGKAT PERGIGIAN</option>
+            <option>PROGRAM DI PDK</option>
+            <option>PROGRAM WARGA EMAS</option>
+            <option>DOKTOR MUDA</option>
+            <option>PELAKSANAAN BRUSH:LMG</option>
+            <option>PELAKSAAN BRUSH:BEGIN</option>
+            <option>SEMINAR JM</option>
+            <option>BULAN KESEDARAN ORAL KANSER</option>
+            <option>PROGRAM ORANG ASLI</option>
+            <option>CDE KOTAK</option>
+            <option>SEMINAR TADIKA/GURU KESIHATAN/TASKA</option>
+            <option>TWIST</option>
+            <option>SEMINAR WARGA EMAS</option>
+            <option>PROGRAM MY BRUSH HOUR</option>
+            <option>LAIN-LAIN (ISI SENDIRI)</option>
+          </select>
+
+          <input class="custom-input" type="text" id="tajukLain" placeholder="Sila tulis tajuk program (Lain-lain)">
+          <div class="hint">Jika pilih “LAIN-LAIN”, sila isi tajuk di atas.</div>
+        </div>
+
+        <div>
+          <label>Lokasi Program</label>
+          <input type="text" id="lokasi" required placeholder="Tuliskan lokasi program">
+        </div>
+
+        <div>
+          <label>Status</label>
+          <select id="status" required>
+            <option value="">-- Pilih Status --</option>
+            <option>Telah hantar paperwork</option>
+            <option>Belum ada perancangan</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="button" class="btn-main" onclick="addRow()">JANA JADUAL & SIMPAN</button>
+
+      <div class="statusbar">
+        <div id="syncStatus">Status: -</div>
+        <div id="rowCount">Rekod: 0</div>
+      </div>
+    </form>
+  </div>
+
+  <div id="tableSection" class="table-container">
+    <div class="action-btns">
+      <button class="btn-export btn-refresh" onclick="loadRows()">🔄 Refresh</button>
+      <button class="btn-export btn-excel" onclick="exportExcel()">📄 Excel</button>
+      <button class="btn-export btn-pdf" onclick="exportPDF()">PDF</button>
+    </div>
+
+    <table id="programTable">
+      <thead>
+        <tr>
+          <th>Tarikh</th><th>Hari</th><th>Penyelaras</th><th>Tajuk Program</th><th>Lokasi</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>© PPDT 2026 | Kegunaan Dalaman Sahaja</footer>
+
+<script>
+  /*************** WAJIB TUKAR ***************/
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzcHGbuS1gGtd5lgKQQkeJqR2p360zwznJ5q554pevGHQQMDD41uhWvSJDB_Qzv5ag/exec";
+  const TOKEN = "PPDT2026TOKEN";
+  /******************************************/
+
+  const syncStatusEl = document.getElementById("syncStatus");
+  const rowCountEl = document.getElementById("rowCount");
+
+  function setStatus(msg){ syncStatusEl.textContent = "Status: " + msg; }
+
+  function updateDay(){
+    const dateInput = document.getElementById('tarikh').value;
+    if(!dateInput) return;
+    const days = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+    const parts = dateInput.split('-');
+    const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    document.getElementById('hari').value = days[d.getDay()];
+  }
+
+  function toggleTajukLain(){
+    const tajuk = document.getElementById('tajuk').value;
+    const input = document.getElementById('tajukLain');
+    if(tajuk === 'LAIN-LAIN (ISI SENDIRI)'){
+      input.style.display = 'block';
+      input.required = true;
+      input.focus();
+    } else {
+      input.style.display = 'none';
+      input.required = false;
+      input.value = '';
+    }
+  }
+
+  // ===== JSONP loader (bypass CORS) =====
+  function loadRows(){
+    setStatus("Loading...");
+    const cb = "__ppdt_cb_" + Date.now();
+    window[cb] = function(data){
+      try{
+        if(!data || !data.ok){
+          setStatus("Gagal load (" + (data?.error || "Unknown") + ")");
+          alert("Gagal load: " + (data?.error || "Unknown"));
+          return;
+        }
+        renderRows(data.rows || []);
+        setStatus("Synced");
+      } finally {
+        delete window[cb];
+      }
+    };
+
+    const s = document.createElement("script");
+    s.src = `${WEB_APP_URL}?action=list&token=${encodeURIComponent(TOKEN)}&callback=${encodeURIComponent(cb)}&_=${Date.now()}`;
+    s.onerror = () => {
+      setStatus("Network error");
+      alert("Network error: JSONP script gagal load. Semak URL / deployment Apps Script.");
+      delete window[cb];
+    };
+    document.body.appendChild(s);
+    // buang script lepas load
+    setTimeout(() => { try{ s.remove(); }catch(e){} }, 4000);
+  }
+
+  function renderRows(rows){
+    const tbody = document.querySelector('#programTable tbody');
+    tbody.innerHTML = "";
+
+    document.getElementById("tableSection").style.display = rows.length ? "block" : "none";
+
+    rows.forEach(r => {
+      const tr = tbody.insertRow();
+      const badge = (r.status === "Telah hantar paperwork") ? "bg-green" : "bg-orange";
+      tr.innerHTML = `
+        <td>${r.tarikh}</td>
+        <td>${r.hari}</td>
+        <td>${r.penyelaras}</td>
+        <td>${r.tajuk}</td>
+        <td>${r.lokasi}</td>
+        <td><span class="badge ${badge}">${r.status}</span></td>
+      `;
+    });
+
+    rowCountEl.textContent = "Rekod: " + rows.length;
+  }
+
+  async function addRow(){
+    const fields = ['tarikh','hari','penyelaras','tajuk','lokasi','status'];
+    const values = {};
+    for(const f of fields){
+      values[f] = document.getElementById(f).value;
+      if(!values[f]){ alert("Sila lengkapkan semua maklumat!"); return; }
+    }
+
+    if(values.tajuk === 'LAIN-LAIN (ISI SENDIRI)'){
+      const custom = document.getElementById('tajukLain').value.trim();
+      if(!custom){ alert("Sila isi tajuk program (Lain-lain)."); return; }
+      values.tajuk = custom;
+    }
+
+    setStatus("Saving...");
+
+    // POST no-cors (bypass CORS). Response tak boleh dibaca, tapi data tetap masuk.
+    try{
+      await fetch(WEB_APP_URL, {
+        method:"POST",
+        mode:"no-cors",
+        headers:{ "Content-Type":"text/plain;charset=utf-8" },
+        body: JSON.stringify({ ...values, token: TOKEN })
+      });
+
+      // bagi masa sheet append
+      setTimeout(() => {
+        loadRows();
+        setStatus("Saved");
+      }, 900);
+
+      document.getElementById('lokasi').value = '';
+      document.getElementById('tajukLain').value = '';
+
+    }catch(err){
+      setStatus("Save error");
+      alert("Gagal simpan (network): " + err.message);
+    }
+  }
+
+  function exportExcel(){
+    const table = document.getElementById("programTable");
+    const wb = XLSX.utils.table_to_book(table, { sheet: "Program Promosi" });
+    XLSX.writeFile(wb, "Jadual_Promosi_PPDT_2026.xlsx");
+  }
+
+  function exportPDF(){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('l','mm','a4');
+    doc.setFontSize(12);
+    doc.text("Jadual Perancangan Program Promosi PPD Tangkak 2026", 14, 15);
+    doc.autoTable({
+      html:'#programTable',
+      startY:25,
+      theme:'grid',
+      headStyles:{ fillColor:[46,0,79] },
+      styles:{ font:'helvetica', fontSize:9 }
+    });
+    doc.save("Jadual_Promosi_PPDT_2026.pdf");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    toggleTajukLain();
+    loadRows();
+  });
+</script>
+
+</body>
+</html>
